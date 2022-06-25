@@ -1,0 +1,327 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use autodie;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use Time::Piece;
+
+our $VERSION = '0.000_01';
+
+my %opt = (
+    format	=> 'text',
+);
+
+GetOptions( \%opt,
+    qw{ count! cpan=s exclude=s@ unreleased! },
+    'html!'	=> \&_set_format,
+    'json!'	=> \&_set_format,
+    help	=> sub { pod2usage( { -verbose => 2 } ) },
+)
+    and my $renderer = __PACKAGE__->can( "render_$opt{format}" )
+    or pod2usage( { -verbose => 0 } );
+
+$opt{exclude} = { map { $_ => 1 } @{
+    $opt{exclude} || [ qw{
+	Perl::Critic::Policy::OTRS::ProhibitLowPrecendeceOps
+	} ]
+    }
+};
+
+require CPAN::Access::AdHoc;
+
+my $cad = CPAN::Access::AdHoc->new(
+    cpan	=> $opt{cpan},
+);
+
+my $module_index = $cad->fetch_module_index();
+
+my @policies;
+
+while ( my ( $name, $data ) = each %{ $module_index } ) {
+    $name =~ m/ \A Perl::Critic::Policy:: /smx
+	or next;
+    5 == scalar split qr{ :: }smx, $name
+	or next;
+    $opt{exclude}{$name}
+	and next;
+    $data->{module_name} = $name;
+    if ( defined( $data->{version} ) && ! $opt{unreleased} ) {
+	$data->{version} =~ m/ \A 0+ [.] 0+ _ /smx
+	    and next;
+    }
+    push @policies, $data;
+}
+
+my %distro;
+my %summary;
+foreach my $data ( @policies ) {
+    my $pkg = $distro{$data->{distribution}} ||=
+	$cad->fetch_distribution_archive( $data->{distribution} );
+
+    my $re = ( split qr{ :: }smx, $data->{module_name} )[-1];
+    $re = qr{ \Q$re\E [.] pm \z }smx;
+    foreach my $member ( $pkg->list_contents() ) {
+	$member =~ $re
+	    or next;
+	my $text = $pkg->get_item_content( $member );
+
+	open my $fhi, '<', \$text;
+	open my $fho, '>', \my $name;
+	pod2usage(	# Subvert Pod::Usage
+	    -exitval	=> 'NOEXIT',
+	    -verbose	=> 99,
+	    -sections	=> 'NAME',
+	    -input	=> $fhi,
+	    -output	=> $fho,
+	);
+	close $fhi;
+	close $fho;
+
+	defined $name
+	    or next;
+	$name =~ s/ \n \s* POD \s+ ERRORS \b .* //smx;
+	$name =~ s/ \A \s+ //smx;
+	$name =~ s/ \s+ \z //smx;
+	$name =~ s/ \s{2,} / /smxg;
+	$name =~ s/ .*? \s -+ \s //smx
+	    or last;
+	$name =~ s/ (?<! [.?!] ) \z /./smx;
+	$name = ucfirst $name;
+
+	$data->{SYNOPSIS} = $name;
+
+	last;
+    }
+    $summary{ $data->{module_name} } = $data;
+    delete $data->{module_name};
+}
+
+$renderer->( \%summary );
+
+sub render_html {
+    my ( $data ) = @_;
+    require CGI;
+    require HTML::Entities;
+    my $cgi = CGI->new();
+    $cgi->charset( 'utf-8' );
+    my $title = 'Annotated Perl::Critic Policy Index';
+    say $cgi->start_html(
+	-title	=> $title,
+    );
+    say $cgi->h1( $title );
+
+    {
+	my $now = gmtime;
+	say '';
+	say $cgi->p( HTML::Entities::encode(
+		$now->strftime( 'Generated %Y-%m-%d %H:%M:%S %Z' )
+	    )
+	);
+    }
+
+    if ( $opt{count} ) {
+	say '';
+	say $cgi->p(
+	    HTML::Entities::encode(
+		sprintf 'Found %s policies', scalar keys %{ $data }
+	    ),
+	);
+    }
+    say '';
+    say $cgi->start_dl();
+    foreach my $module_name (
+	map { $_->[0] }
+	sort { $a->[1] cmp $b->[1] }
+	map { [ $_, lc $_ ] }
+	keys %{ $data }
+    ) {
+	my $info = $data->{$module_name};
+	say '';
+	say $cgi->dt(
+	    $cgi->br(),
+	    $cgi->a( {
+		    href	=>
+		    "https://metacpan.org/module/$module_name",
+		},
+		HTML::Entities::encode( $module_name ),
+	    ),
+	);
+	my @dd = ( $info->{distribution} );
+	defined $info->{SYNOPSIS}
+	    and push @dd, $info->{SYNOPSIS};
+	say $cgi->dd(
+	    join $cgi->br(), map { HTML::Entities::encode( $_ ) } @dd,
+	);
+    }
+    say $cgi->end_dl();
+    say $cgi->end_html();
+    return;
+}
+
+sub render_json {
+    my ( $data ) = @_;
+    require JSON;
+    my $json = JSON->new()->utf8()->pretty()->canonical();
+    my $whole_thing = {
+	policies	=> $data,
+    };
+    $opt{count}
+	and $whole_thing->{count} = keys %{ $data };
+    binmode STDOUT, ':encoding(utf-8)';
+    say $json->encode( $data );
+    return;
+}
+
+sub render_text {
+    my ( $data ) = @_;
+    require Text::Wrap;
+    local $Text::Wrap::columns = 72;
+    foreach my $module_name ( sort keys %{ $data } ) {
+	my $info = $data->{$module_name};
+	say '';
+	say $module_name;
+	say "    $info->{distribution}";
+	defined $info->{SYNOPSIS}
+	    and say Text::Wrap::wrap(
+		'    ',
+		'        ',
+		$info->{SYNOPSIS},
+	    );
+    }
+    $opt{count}
+	and say sprintf "\nFound %s policies", scalar keys %{ $data };
+    return;
+}
+
+sub _render_POD {
+    my ( $class, $pod ) = @_;
+    my $parser = $class->new();
+    $parser->output_string( \my $rendered );
+    $parser->parse_string_document( <<"EOD" );
+=pod
+
+$pod
+
+=cut
+EOD
+    $rendered =~ s/ \A \s* //smx;
+    $rendered =~ s/ \s* \z //smx;
+    $rendered =~ s/ \s+ / /smxg;
+    return $rendered;
+}
+
+sub _set_format {
+    my ( $name, $value ) = @_;
+    $opt{format} = $value ? "$name" : 'text';
+}
+
+__END__
+
+=head1 TITLE
+
+all-perl-critic-policies - Summarize all Perl-Critic policies indexed on CPAN
+
+=head1 SYNOPSIS
+
+ all-perl-critic-policies
+ all-perl-critic-policies --html
+ all-perl-critic-policies --json
+ all-perl-critic-policies --help
+ all-perl-critic-policies --version
+
+=head1 OPTIONS
+
+=head2 --count
+
+If asserted, this Boolean option causes the number of policies to be
+appended to the output.
+
+The default is C<--no-count>.
+
+=head2 --cpan
+
+ --cpan http://cpan.pair.com/
+
+This option specifies the CPAN mirror to use. The default is as computed
+by L<CPAN::Access::AdHoc|CPAN::Access::AdHoc>.
+
+=head2 --exclude
+
+This option specifies the name of a module to exclude from the output.
+It may be specified more than once.
+
+If not specified,
+C<Perl::Critic::Policy::OTRS::ProhibitLowPrecendeceOps>, since it looks
+to me to be replaced by a module with 'Precedence' spelled correctly.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 --html
+
+If asserted, this option causes the output to be an HTML C<< <dl> >>
+list, with the module names made into links to L<https://metacpan.org/>.
+
+=head2 --json
+
+If asserted, this option causes the output to be a JSON dump of the
+data.
+
+If both C<-html> and C<-json> are specified, the rightmost wins.
+
+=head2 --unreleased
+
+If asserted, this Boolean option causes unreleased modules to be
+included. These are defined as modules whose version contains an
+underscore, with only zeroes before the underscore.
+
+The default is C<--no-unreleased>.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script accesses the user's CPAN repository, finds all
+L<Perl::Critic|Perl::Critic> policy modules, and summarizes each of
+them.
+
+By default, the output is text, with the name of the module, the
+distribution it was found in, and the synopsis of the module from its
+POD, if that can be found. For other formats, see the C<-html> and
+C<-json> options.
+
+B<Note that this script uses unpublished module C<CPAN::Access::AdHoc>,
+which is loaded at run time so that things like L<--help|/--help> can be
+run without it.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013, 2020, 2022 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the Artistic
+License 1.0 at
+L<http://www.perlfoundation.org/artistic_license_1_0>, and/or the Gnu
+GPL at L<http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt>.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

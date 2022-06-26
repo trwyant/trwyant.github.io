@@ -181,6 +181,7 @@ sub render_json {
 sub render_text {
     my ( $data ) = @_;
     require Text::Wrap;
+    no warnings qw{ once };
     local $Text::Wrap::columns = 72;
     foreach my $module_name ( sort keys %{ $data } ) {
 	my $info = $data->{$module_name};

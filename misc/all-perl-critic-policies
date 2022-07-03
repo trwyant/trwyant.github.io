@@ -64,19 +64,33 @@ foreach my $data ( @policies ) {
     my $pkg = $distro{$data->{distribution}} ||=
 	$cad->fetch_distribution_archive( $data->{distribution} );
 
-    my $re = ( split qr{ :: }smx, $data->{module_name} )[-1];
-    $re = qr{ \Q$re\E [.] pm \z }smx;
+    my $module_filter = do {
+	my @parts = split qr{ :: }smx, $data->{module_name};
+	$parts[-1] .= '.pm';
+	local $" = '/';
+	qr< / \Q@parts\E \z >smx;
+    };
+
     foreach my $member ( $pkg->list_contents() ) {
-	$member =~ $re
+	$member =~ $module_filter
 	    or next;
 	my $text = $pkg->get_item_content( $member );
+
+	state $want_sections = [
+	    'NAME',
+	    'POLICY MOVED',	# For Perl::Critic::Policy::Freenode::*
+	];
+	state $strip_names = do {
+	    local $" = '|';
+	    qr<\s*\b(?:@{ $want_sections}):\s*>i;
+	};
 
 	open my $fhi, '<', \$text;
 	open my $fho, '>', \my $name;
 	pod2usage(	# Subvert Pod::Usage
 	    -exitval	=> 'NOEXIT',
 	    -verbose	=> 99,
-	    -sections	=> 'NAME',
+	    -sections	=> $want_sections,
 	    -input	=> $fhi,
 	    -output	=> $fho,
 	);
@@ -85,14 +99,16 @@ foreach my $data ( @policies ) {
 
 	defined $name
 	    or next;
+
 	$name =~ s/ \n \s* POD \s+ ERRORS \b .* //smx;
+	$name =~ s/$strip_names/\n/g;
 	$name =~ s/ \A \s+ //smx;
 	$name =~ s/ \s+ \z //smx;
 	$name =~ s/ \s{2,} / /smxg;
 	$name =~ s/ .*? \s -+ \s //smx
 	    or last;
-	$name =~ s/ (?<! [.?!] ) \z /./smx;
 	$name = ucfirst $name;
+	$name =~ s/ (?<! [.?!] ) $ /./smxg;
 
 	$data->{SYNOPSIS} = $name;
 
@@ -153,8 +169,9 @@ sub render_html {
 	    ),
 	);
 	my @dd = ( $info->{distribution} );
-	defined $info->{SYNOPSIS}
-	    and push @dd, $info->{SYNOPSIS};
+	if ( defined $info->{SYNOPSIS} ) {
+	    push @dd, split /\n/, $info->{SYNOPSIS};
+	}
 	say $cgi->dd(
 	    join $cgi->br(), map { HTML::Entities::encode( $_ ) } @dd,
 	);
@@ -188,12 +205,13 @@ sub render_text {
 	say '';
 	say $module_name;
 	say "    $info->{distribution}";
-	defined $info->{SYNOPSIS}
-	    and say Text::Wrap::wrap(
+	if ( defined $info->{SYNOPSIS} ) {
+	    say Text::Wrap::wrap(
 		'    ',
 		'        ',
-		$info->{SYNOPSIS},
-	    );
+		$_
+	    ) for split /\n/, $info->{SYNOPSIS};
+	}
     }
     $opt{count}
 	and say sprintf "\nFound %s policies", scalar keys %{ $data };

@@ -16,7 +16,7 @@
 
 <p>I wondered whether one of the alternatives I was choosing among was faster than another, so I decided to <a href="https://perldoc.perl.org/Benchmark.html"><code>Benchmark</code></a> them. Both implementations applied the regular expression to a global variable. In practice this would probably be a localized <code>$_</code>, but my read of the <a href="https://perldoc.perl.org/Benchmark.html"><code>Benchmark</code></a> module says that it also localizes <code>$_</code>, but leaves it <code>undef</code>.</p>
 
-<p><strong>Note</strong> that the empty pattern is not checked, because it is equivalent to the last successfully-matched pattern, if any. The <code>sub { 1 }</code> was included because if we're dealing in code references, the null filter simply needs to return a true value.</p>
+<p><strong>Note</strong> that the empty pattern is not benchmarked, because it is equivalent to the last successfully-matched pattern, if any. The <code>sub { 1 }</code> was included because if we're dealing in code references, the null filter simply needs to return a true value.</p>
 
 <p>Here are the results, obtained with Perl 5.36.0, unthreaded. The script that generated them is on <a href="https://trwyant.github.io/blog/2022-08-05/match-anything-quickly.PL">GitHub</a></p>
 

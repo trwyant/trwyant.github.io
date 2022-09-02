@@ -10,9 +10,11 @@
 
 <h1>Annotated Perl::Critic Policy Index</h1>
 
-<p>Generated 2022-09-02 08:07:58 UTC</p>
+<p>Generated 2022-09-02 19:05:17 UTC</p>
 
-<p>Found 346 policies</p>
+<p>Found 353 policies</p>
+
+<p><strong>Note</strong> that previous versions of this list omitted policies whose module names had more than 5 components. Correcting this omission added 7 policies.</p>
 
 <dl>
 
@@ -526,8 +528,26 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer">Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.140.tar.gz<br />Write &quot;open $fh, q{&lt;:encoding(UTF-8)}, $filename;&quot; instead of &quot;open $fh, q{&lt;:utf8}, $filename;&quot;.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::ProhibitComplexMappings::LinesNotStatements">Perl::Critic::Policy::Lax::ProhibitComplexMappings::LinesNotStatements</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Prohibit multiline maps, not multistatement maps.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::ProhibitEmptyQuotes::ExceptAsFallback">Perl::Critic::Policy::Lax::ProhibitEmptyQuotes::ExceptAsFallback</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Empty quotes are okay as the fallback on the rhs of ||.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::ProhibitLeadingZeros::ExceptChmod">Perl::Critic::Policy::Lax::ProhibitLeadingZeros::ExceptChmod</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Leading zeroes are okay as the first arg to chmod.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::ProhibitStringyEval::ExceptForRequire">Perl::Critic::Policy::Lax::ProhibitStringyEval::ExceptForRequire</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Stringy eval is bad, but it&#39;s okay just to &quot;require&quot;.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq">Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Constant value on the right side is ok with &#39;eq&#39;.<br />Perl::Critic::Policy::Lax::RequireConstantOnLeftSideOfEquality::ExceptEq - constant value on the right side is ok with &#39;eq&#39;.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::RequireEndWithTrueConst">Perl::Critic::Policy::Lax::RequireEndWithTrueConst</a></dt>
 <dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />Ending your package with a simple, fun true value is okay.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata">Perl::Critic::Policy::Lax::RequireExplicitPackage::ExceptForPragmata</a></dt>
+<dd>R/RJ/RJBS/Perl-Critic-Lax-0.013.tar.gz<br />You can put strict and warnings before &quot;package&quot;.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::logicLAB::ModuleBlacklist">Perl::Critic::Policy::logicLAB::ModuleBlacklist</a></dt>
 <dd>J/JO/JONASBN/Perl-Critic-Policy-logicLAB-ModuleBlacklist-0.04.tar.gz<br />Blacklist modules you want to prohibit use of.</dd>
@@ -630,6 +650,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Modules::RequireExplicitPackage">Perl::Critic::Policy::Modules::RequireExplicitPackage</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.140.tar.gz<br />Always make the &quot;package&quot; explicit.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad">Perl::Critic::Policy::Modules::RequireExplicitPackage::ObjectPad</a></dt>
+<dd>D/DE/DERIV/Perl-Critic-Policy-Modules-RequireExplicitPackage-ObjectPad-0.001.tar.gz<br />Always make the package/Object::Pad class explicit.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage">Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.140.tar.gz<br />Package declaration must match filename.</dd>

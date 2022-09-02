@@ -29,6 +29,7 @@ GetOptions( \%opt,
 $opt{exclude} = { map { $_ => 1 } @{
     $opt{exclude} || [ qw{
 	Perl::Critic::Policy::OTRS::ProhibitLowPrecendeceOps
+	Perl::Critic::Policy::Documentation::ProhibitAdjacentLinks::Parser
 	} ]
     }
 };
@@ -46,7 +47,7 @@ my @policies;
 while ( my ( $name, $data ) = each %{ $module_index } ) {
     $name =~ m/ \A Perl::Critic::Policy:: /smx
 	or next;
-    5 == scalar split qr{ :: }smx, $name
+    scalar( split qr{ :: }smx, $name ) >= 5
 	or next;
     $opt{exclude}{$name}
 	and next;

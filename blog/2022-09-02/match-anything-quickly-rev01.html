@@ -1,0 +1,78 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Match Anything, Quickly -- Revision 1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Match Anything, Quickly -- Revision 1</h1>
+
+<cite>O wad some Power the giftie gie us<br />
+    To see oursels as ithers see us!<br />
+    It wad frae mony a blunder free us,<br />
+    An’ foolish notion: ...</cite>
+
+<p>My previous blog post, <a href="https://blogs.perl.org/users/tom_wyant/2022/08/match-anything-quickly.html">Match Anything, Quickly</a>, brought a number of responses which are worth reading in their own right. The one that triggered this post, though, was from <a href="https://nrdvana.net/">Nerdvana</a> and Devin of Cincinnati Perl Mongers, who pointed out an error in my benchmark script. I had left off the intended <code>/smx</code> from the <code>qr/ ... /</code> version of the test, which meant that the regular expression did not in fact match.</p>
+
+<p><strong>Three cheers for code reviews!</strong></p>
+
+<p>The Cincinnati Perl Mongers came up with a further case which combines my two:</p>
+
+<pre>
+eval "do { my \$regex = qr/ $re /smx; " .
+        "sub { \$MATCH =~ /\$regex/o }};"
+</pre>
+
+<p>They benchmarked this as being slightly slower than the case where the regular expression is simply interpolated into the subroutine verbatim.</p>
+
+<p>Interestingly (to me, at least) they reported that the removal of the <code>/o</code> modifier made their case 2-3 times slower. This surprised me somewhat, as I had understood that modern Perls (for some value of "modern") had done things to minimize the performance difference between the presence and absence of <code>/o</code>.</p>
+
+<p>For the record, the corrected script is also on <a href="https://trwyant.github.io/blog/2022-09-02/match-anything-quickly-rev01.PL">GitHub</a>. The corrections include an option that tests to make sure all benchmarked things actually match. The result of running this with the <code>--test</code> and <code>--html</code> options (on a different machine than the original post) is:</p>
+
+<pre>
+ok 1 - sub { 1 }
+ok 2 - sub { $MATCH =~ m/ (*ACCEPT) /smx }
+ok 3 - qr/ (*ACCEPT) /smx
+ok 4 - sub { $MATCH =~ m/ (?) /smx }
+ok 5 - qr/ (?) /smx
+ok 6 - sub { $MATCH =~ m/ (?:) /smx }
+ok 7 - qr/ (?:) /smx
+ok 8 - sub { $MATCH =~ m/ .? /smx }
+ok 9 - qr/ .? /smx
+ok 10 - sub { $MATCH =~ m/ .{0} /smx }
+ok 11 - qr/ .{0} /smx
+ok 12 - sub { $MATCH =~ m/ \A /smx }
+ok 13 - qr/ \A /smx
+ok 14 - sub { $MATCH =~ m/ ^ /smx }
+ok 15 - qr/ ^ /smx
+1..15
+</pre>
+
+<table>
+<thead>
+<tr><th>Implementation</th><th>Rate</th></tr>
+</thead>
+<tbody>
+<tr><td>sub { 1 }</td><td style="text-align: right;">434782608.70/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ \A /smx }</td><td style="text-align: right;">13333333.33/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ ^ /smx }</td><td style="text-align: right;">13315579.23/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ (?:) /smx }</td><td style="text-align: right;">12315270.94/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ (?) /smx }</td><td style="text-align: right;">11173184.36/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ .{0} /smx }</td><td style="text-align: right;">10593220.34/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ .? /smx }</td><td style="text-align: right;">10449320.79/sec</td></tr>
+<tr><td>sub { $MATCH =~ m/ (*ACCEPT) /smx }</td><td style="text-align: right;">4380201.49/sec</td></tr>
+<tr><td>qr/ ^ /smx</td><td style="text-align: right;">2612330.20/sec</td></tr>
+<tr><td>qr/ \A /smx</td><td style="text-align: right;">2603488.67/sec</td></tr>
+<tr><td>qr/ (?:) /smx</td><td style="text-align: right;">2586652.87/sec</td></tr>
+<tr><td>qr/ (?) /smx</td><td style="text-align: right;">2575991.76/sec</td></tr>
+<tr><td>qr/ .{0} /smx</td><td style="text-align: right;">2518891.69/sec</td></tr>
+<tr><td>qr/ .? /smx</td><td style="text-align: right;">2510670.35/sec</td></tr>
+<tr><td>qr/ (*ACCEPT) /smx</td><td style="text-align: right;">1849796.52/sec</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

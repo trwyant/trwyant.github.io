@@ -10,6 +10,8 @@
 
 <h1>Match Anything, Quickly</h1>
 
+<p><strong>Revision:</strong> that Cincinnati Perl Mongers found an error in the benchmark script used for this post. <a href="http://blogs.perl.org/users/tom_wyant/2022/09/match-anything-quickly----revision-1.html">Match Anything Quickly - Revision 1</a> discusses their findings and links to a revised benchmark script. -- TRW 2022-09-02</p>
+
 <p>Sometimes I want to filter a set of strings, but the details of the filter are not known beforehand. In particular, I may want a null filter, which simply accepts anything.</p>
 
 <p>This looks like a job for a regular expression, but I can think of at least two implementations. One is to pass around regular expression objects. The second is to wrap a match (<code>m//</code>) in a subroutine reference, and pass that around. Given the use of regular expressions, there are a number of possibilities for a regular expression that matches any string.</p>

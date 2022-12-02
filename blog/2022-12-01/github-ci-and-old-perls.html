@@ -1,0 +1,69 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Making GitHub CI work with Perl 5.8.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Making GitHub CI work with Perl 5.8.</h1>
+
+<p>A while back. I got a pull request from Gabor Szabo adding a GitHub action to one of my distributions. I have been working with this, but have not (so far) blogged about it because, quite frankly, I am still not sure I know what I am doing.</p>
+
+<p>One of my personal desires was to test my distributions on the oldest practicable Perl for each available architecture. For Unix (i.e. Linux and macOS) this is 5.8.8, provided the distribution itself supports that. A couple days ago, though, I pushed a modification to one of my distributions and had the 5.8.8 tests blow up.</p>
+
+<p>The problem turned out to be that <a href="https://metacpan.org/pod/Module::Build">Module::Build</a>, for reasons I have not investigated, has <a href="https://metacpan.org/pod/Pod::Man">Pod::Man</a> as a dependency. The current version of <code>Module::Build</code> requires <code>Pod::Man</code> version 2.17, but according to <a href="https://perldoc.perl.org/corelist">corelist</a> Perl 5.8.8 comes with <code>Pod::Man</code> version 1.37, so <code>cpanm</code> wants to upgrade it.</p>
+
+<p>The problem with this is that as of version 5.0 released November 25 2022, the <a href="https://metacpan.org/dist/podlators">podlators</a> distribution, which supplies <code>Pod::Man</code>, requires Perl 5.10. So under 5.8.8, <code>cpanm --with-configure --notest --installdeps .</code> dies trying to install <code>podlators</code>.</p>
+
+<p>The solution I came up with was to pre-emptively install <code>RRA/podlators-4.14.tar.gz</code> under Perl 5.8.8. The implementation was in two parts: define an environment variable that recorded whether we were running under Perl 5.10, and define a job step conditioned on that variable to install <code>podlators 4.14</code> if we were using an earlier Perl.</p>
+
+<p>Under GitHub Actions you can define environment variables by appending their definitions to the file whose path is in environment variable <code>GITHUB_ENV</code>. After struggling with PowerShell for the Windows runners, I decided to do that step in Perl. The core of the Perl script is:</p>
+
+<pre>
+defined $ENV{GITHUB_ENV}
+    and $ENV{GITHUB_ENV} ne ''
+    or die "Environment variable GITHUB_ENV undefined or empty\n";
+open my $fh, '&gt;&gt;:encoding(utf-8)', $ENV{GITHUB_ENV}
+    or die "Can not open $ENV{GITHUB_ENV}: $!\n";
+
+my $home = File::HomeDir-&gt;my_home();
+my $is_5_10 = "$]" &gt;= 5.010 ? 1 : '';
+my $is_windows = {
+    MSWin32	=&gt; 1,
+    dos		=&gt; 1,
+}-&gt;{$^O} || '';
+my $is_unix = $is_windows ? '' : 1;
+
+print $fh &lt;&lt;"EOD";
+MY_HOME=$home
+MY_IS_UNIX=$is_unix
+MY_IS_WINDOWS=$is_windows
+MY_PERL_IS_5_10=$is_5_10
+EOD
+</pre>
+
+<p>Next I had to run this from the YAML file that defined the workflow, and act on the created value. This was done using two steps:</p>
+
+<pre>
+    - name: Customize environment
+      run: |
+        cpanm -v
+        cpanm File::HomeDir
+        perl .github/workflows/environment.PL
+</pre>
+
+<p>and</p>
+
+<pre>
+    - name: Install old podlators distro if on old Perl
+      if: "! env.MY_PERL_IS_5_10"
+      run: cpanm RRA/podlators-4.14.tar.gz
+</pre>
+
+<p>The entirety of both the GitHub Actions file <code>ci.yml</code> and the Perl script <code>environment.PL</code> can be found in <a href="https://github.com/trwyant/perl-Astro-Coord-ECI/tree/master/.github/workflows">the GitHub repository for Astro::Coord::ECI</a>. Other, and probably better, implementations can be imagined.</p>
+
+</body>
+</html>

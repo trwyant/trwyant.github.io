@@ -18,7 +18,7 @@ my %opt = (
 );
 
 GetOptions( \%opt,
-    qw{ count! cpan=s exclude=s@ unreleased! },
+    qw{ count! cpan=s exclude=s@ min_parts|min-parts=i unreleased! },
     'html!'	=> \&_set_format,
     'json!'	=> \&_set_format,
     help	=> sub { pod2usage( { -verbose => 2 } ) },
@@ -26,12 +26,52 @@ GetOptions( \%opt,
     and my $renderer = __PACKAGE__->can( "render_$opt{format}" )
     or pod2usage( { -verbose => 0 } );
 
-$opt{exclude} = { map { $_ => 1 } @{
-    $opt{exclude} || [ qw{
+my $root = @ARGV ? $ARGV[0] : 'Perl::Critic::Policy';
+
+# FIXME be a little smarter about exclusion. Like maybe exclude name
+# spaces which do not have their own file, which many of the
+# Test2::Tools things are.
+state $exclude = {
+    'Perl::Critic::Policy' => [ qw{
 	Perl::Critic::Policy::OTRS::ProhibitLowPrecendeceOps
 	Perl::Critic::Policy::Documentation::ProhibitAdjacentLinks::Parser
-	} ]
-    }
+    } ],
+    'Test2::Tools' => [ qw{
+	Test2::Tools::DOM::Check
+	Test2::Tools::FFI::Platypus
+	Test2::Tools::FFI::Single
+	Test2::Tools::HTTP::Apps
+	Test2::Tools::HTTP::Guard
+	Test2::Tools::HTTP::ResponseCompare
+	Test2::Tools::HTTP::Tx
+	Test2::Tools::HTTP::Tx::Request
+	Test2::Tools::HTTP::Tx::Response
+	Test2::Tools::HTTP::UA
+	Test2::Tools::HTTP::UA::Error
+	Test2::Tools::HTTP::UA::LWP
+	Test2::Tools::HTTP::UA::LWPClass
+	Test2::Tools::HTTP::UA::LWPClass::Proto
+	Test2::Tools::HTTP::UA::Mojo::Proxy
+	Test2::Tools::Process::Event
+	Test2::Tools::Process::Exec
+	Test2::Tools::Process::Exit
+	Test2::Tools::Process::Proc
+	Test2::Tools::Process::System
+	Test2::Tools::Process::SystemProc
+	Test2::Tools::URL::Check
+    } ],
+};
+
+$opt{exclude} ||= $exclude->{$root} || [];
+$opt{_exclude} = { map { $_ => 1 } @{ $opt{exclude} } };
+
+state $min_parts = {
+    'Perl::Critic::Policy' => 5,
+};
+
+$opt{min_parts} = $min_parts->{$root} // do {
+    my @parts = split /::/, $root;
+    1 + scalar @parts;
 };
 
 require CPAN::Access::AdHoc;
@@ -42,14 +82,16 @@ my $cad = CPAN::Access::AdHoc->new(
 
 my $module_index = $cad->fetch_module_index();
 
+my $module_re = qr/ \A \Q$root\E :: /smx;
+
 my @policies;
 
 while ( my ( $name, $data ) = each %{ $module_index } ) {
-    $name =~ m/ \A Perl::Critic::Policy:: /smx
+    $name =~ $module_re
 	or next;
-    scalar( split qr{ :: }smx, $name ) >= 5
+    scalar( split qr{ :: }smx, $name ) >= $opt{min_parts}
 	or next;
-    $opt{exclude}{$name}
+    $opt{_exclude}{$name}
 	and next;
     $data->{module_name} = $name;
     if ( defined( $data->{version} ) && ! $opt{unreleased} ) {
@@ -67,12 +109,12 @@ foreach my $data ( @policies ) {
 
     my $module_filter = do {
 	my @parts = split qr{ :: }smx, $data->{module_name};
-	$parts[-1] .= '.pm';
 	local $" = '/';
-	qr< / \Q@parts\E \z >smx;
+	qr< / \Q@parts\E [.] (?: pod | pm ) \z >smx;
     };
 
-    foreach my $member ( $pkg->list_contents() ) {
+    # ASCIIbetical sort ensures .pod (if any) comes after .pm.
+    foreach my $member ( sort( $pkg->list_contents() ) ) {
 	$member =~ $module_filter
 	    or next;
 	my $text = $pkg->get_item_content( $member );
@@ -119,7 +161,22 @@ foreach my $data ( @policies ) {
     delete $data->{module_name};
 }
 
+{
+    my @parts = split /::/, $root;
+    my $tail = pop @parts;
+    local $" = '::';
+    $opt{title} //= "Annotated @parts $tail Index";
+    $opt{unit} //= {
+	'Test2::Tools'	=> 'tool',
+    }->{$root} // lc $tail;
+}
+
 $renderer->( \%summary );
+
+sub format_count {
+    my ( $count ) = @_;
+    return sprintf 'Found %d %s', $count, pluralize( $count, $opt{unit} );
+}
 
 sub render_html {
     my ( $data ) = @_;
@@ -127,11 +184,10 @@ sub render_html {
     require HTML::Entities;
     my $cgi = CGI->new();
     $cgi->charset( 'utf-8' );
-    my $title = 'Annotated Perl::Critic Policy Index';
     say $cgi->start_html(
-	-title	=> $title,
+	-title	=> $opt{title},
     );
-    say $cgi->h1( $title );
+    say $cgi->h1( $opt{title} );
 
     {
 	my $now = gmtime;
@@ -146,7 +202,7 @@ sub render_html {
 	say '';
 	say $cgi->p(
 	    HTML::Entities::encode(
-		sprintf 'Found %s policies', scalar keys %{ $data }
+		format_count( scalar keys %{ $data } ),
 	    ),
 	);
     }
@@ -196,6 +252,17 @@ sub render_json {
     return;
 }
 
+sub pluralize {
+    my ( $count, $word ) = @_;
+    $count == 1
+	and return $word;
+    $word =~ m/ s \z /smx
+	and return $word;
+    $word =~ s/ y \z /ies/smx
+	and return $word;
+    return "${word}s";
+}
+
 sub render_text {
     my ( $data ) = @_;
     require Text::Wrap;
@@ -214,26 +281,11 @@ sub render_text {
 	    ) for split /\n/, $info->{SYNOPSIS};
 	}
     }
-    $opt{count}
-	and say sprintf "\nFound %s policies", scalar keys %{ $data };
+    if ( $opt{count} ) {
+	say '';
+	say format_count( scalar keys %{ $data } );
+    }
     return;
-}
-
-sub _render_POD {
-    my ( $class, $pod ) = @_;
-    my $parser = $class->new();
-    $parser->output_string( \my $rendered );
-    $parser->parse_string_document( <<"EOD" );
-=pod
-
-$pod
-
-=cut
-EOD
-    $rendered =~ s/ \A \s* //smx;
-    $rendered =~ s/ \s* \z //smx;
-    $rendered =~ s/ \s+ / /smxg;
-    return $rendered;
 }
 
 sub _set_format {
@@ -250,6 +302,7 @@ all-perl-critic-policies - Summarize all Perl-Critic policies indexed on CPAN
 =head1 SYNOPSIS
 
  all-perl-critic-policies
+ all-perl-critic-policies Test2::Tools
  all-perl-critic-policies --html
  all-perl-critic-policies --json
  all-perl-critic-policies --help
@@ -276,9 +329,8 @@ by L<CPAN::Access::AdHoc|CPAN::Access::AdHoc>.
 This option specifies the name of a module to exclude from the output.
 It may be specified more than once.
 
-If not specified,
-C<Perl::Critic::Policy::OTRS::ProhibitLowPrecendeceOps>, since it looks
-to me to be replaced by a module with 'Precedence' spelled correctly.
+If not specified, a default B<may> be provided based on the name space
+being indexed.
 
 =head2 --help
 
@@ -297,6 +349,17 @@ data.
 
 If both C<-html> and C<-json> are specified, the rightmost wins.
 
+=head2 --min-parts
+
+ --min-parts 4
+
+This option specifies the minimum number of parts a package name needs
+to be eligable for listing.
+
+The default is normally one more than the parts in the name space (so
+C<3> for C<Test2::Tools>, but C<Perl::Critic::Policies> is special-cased
+to C<5>.
+
 =head2 --unreleased
 
 If asserted, this Boolean option causes unreleased modules to be
@@ -311,9 +374,9 @@ This option displays the version of this script. The script then exits.
 
 =head1 DETAILS
 
-This Perl script accesses the user's CPAN repository, finds all
-L<Perl::Critic|Perl::Critic> policy modules, and summarizes each of
-them.
+This Perl script accesses the user's CPAN repository, finds all modules
+whose name begins with (but does not include) the string given on the
+command line. The default is C<'Perl::Critic::Policy'>.
 
 By default, the output is text, with the name of the module, the
 distribution it was found in, and the synopsis of the module from its
@@ -330,7 +393,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013, 2020, 2022 by Thomas R. Wyant, III
+Copyright (C) 2013, 2020, 2022-2023 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the Artistic

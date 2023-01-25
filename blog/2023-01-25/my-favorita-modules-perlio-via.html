@@ -1,0 +1,83 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>My Favorite Modules: PerlIO::via</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>My Favorite Modules: PerlIO::via</h1>
+
+<p>OK, I confess: <a href="https://metacpan.org/pod/PerlIO::via">PerlIO::via</a> is not a module that I use every day. It allows you, easily, and with minimal code, to modify an I/O stream <strong>before</strong> it gets to the reader of the stream. or <strong>after</strong> the writer has written it. All you do is write (say) <code>My::Module</code> conforming to the parts of the <code>PerlIO::via</code> interface you need, and provide it to the second argument of <code>open()</code> or <code>binmode()</code> as <code>':via(My::Module)'</code>. How cool is that? And how cool is a language that lets you do that with a minimum of fuss, bother, and code?</p>
+
+<p>I encountered this when trying to modify (OK, hack) the behavior of a large and complex hunk of Perl not under my control. Rummaging around in this turned up the fact that all file input went through a single module/object, which had an <code>open()</code> method. I realized if I could insert my own <a href="https://perldoc.perl.org/PerlIO.html">PerlIO</a> layer into the input stream, I would have control over what the <s>victim</s> host code saw.</p>
+
+<p>In the true spirit of the Conan the Barbarian school of programming ("Bash it until it submits!") I wrote a <code>PerlIO::via</code> module whose <code>import()</code> method monkey-patched the <code>open()</code> to insert my layer into the stack. All I had to do was launch the host code with <code>-MMy::Module</code> and the dirty deed was done.</p>
+
+<p>If you read the <a href="https://metacpan.org/pod/PerlIO::via">PerlIO::via</a> documentation you see a whole host of methods you can provide. All I wanted to do was modify the input stream, and that can be done by implementing just two or three:</p>
+
+<p>You will have to provide <code>PUSHED()</code>, which is called when your layer is pushed onto the I/O stack. That is, when someone specifies it in the second argument of <code>open()</code> or <code>binmode()</code>. This is called as a static method, and given a <a href="https://linux.die.net/man/3/fopen"><code>fopen()</code></a>-style mode string (i.e. <code>'r'</code>, <code>'w'</code>, or what have you) and the already-opened handle, which represents the layer below. This method needs to instantiate and return an object of the given class. Depending on your needs, this can be as simple as</p>
+
+<pre>
+sub PUSHED {
+    my ( $class ) = @_;
+    return bless {}, $class;
+}
+</pre>
+
+<p>You have a couple options for how to get the input, but I opted for <code>FILL()</code>. This is called as a method, and passed a file handle which is open to the next layer down in the PerlIO stack. This would look something like:</p>
+
+<pre>
+sub FILL {
+    my ( $self, $fh ) = @_;
+    defined( my $data = &lt;$fh&gt; )
+        or return;
+
+    # Do your worst to the $data
+
+    return $data;
+}
+</pre>
+
+<p>A few paragraphs back I said "two or three" methods. For a while I was content with the above two. But then I realized that the caller was getting back bytes even if the file was opened with <code>:encoding(...)</code> specified in a lower layer, and the <code>FILL()</code> method preserved the character-nature of the data. Wrestling with this finally drove me back to the documentation, where I found the <code>UTF8()</code> method.</p>
+
+<p>The <code>UTF8()</code> method is optional, and is called (if it exists) right after <code>PUSHED()</code>. It receives one argument, which is interpreted as a Boolean, and is true if the next-lower layer provides characters rather than bytes. The returned value tells <code>PerlIO</code> whether your layer provides characters (if true) or bytes (if false). A minimal-but-sufficient implementation is</p>
+
+<pre>
+sub UTF8 {
+    my ( undef, $below_flag ) = @_;
+    return $below_flag;
+}
+</pre>
+
+<p><strong>Caveat:</strong> If you apply the encoding and your layer in the same operation (e.g. <code>binmode $fh, ':encoding(utf-8):via(My::Module)';</code>, the <code>UTF8()</code> method will <strong>not</strong> see a true value of <code>$below_flag</code>. There are two ways of dealing with this:</p>
+
+<ul>
+    <li>Apply your <code>PerlIO::via</code> layer in a separate call to <code>binmode()</code>, or</li>
+    <li>Specify an explicit <code>:utf8</code> after your layer (that is, <code>binmode $fh, ':encoding(utf-8):via(My::Module):utf8';</code>).</li>
+</ul>
+
+<p>This is already a longer note than I like, but I have to say something about <code>:utf8</code>. The current documentation calls it a pseudo-layer. What it really is is a bit on the layer below, telling <code>PerlIO</code> that the layer it applies to provides characters rather than bytes on input, or accepts characters on output. Around Perl 5.8 or 5.10 there was a fair amount of misunderstanding about what <code>:utf8</code> did, and there was actually core Perl documentation that said (or seemed to say) that you did UTF-8 I/O by specifying this layer. Most such instances of <code>:utf8</code> in the core documentation have been replaced by <code>:encoding(utf-8)</code> but there may still be some <code>:utf8</code> in outlying regions of the documentation.</p>
+
+<p>By using <code>:utf8</code> in the second example above, what I am telling Perl is that <code>:via(My::Module)</code> produces decoded output. It does, because the layer below it (<code>:encode(utf-8)</code>) does, and <code>:via(My::Module)</code> preserves this property. Without the <code>:encode(utf-8)</code> below it it would be an error to tell PerlIO that <code>:via(My::Module)</code> produced characters unless <code>My::Module</code> did the decoding itself.</p>
+
+<p>If you want to see what layers are in effect on file handle <code>$fh</code>, you can call <code>PerlIO::get_layers( $fh )</code>. This returns a list, which will include <code>:utf8</code> as a separate entry, maybe more than once if more than one layer has that bit set.</p>
+
+<p>Previous entries in this series:</p>
+
+<ol>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2021/09/my-favorite-modules-if.html"><code>if</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2021/10/my-favorite-modules-diagnostics-one.html"><code>diagnostics</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2021/11/my-favorite-modules-termreadlineperl.html"><code>Term::ReadLine::Perl</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/02/my-favorite-modules-re.html"><code>re</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/02/my-favorite-modules-develnytprof.html"><code>Devel::NYTProf</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/05/my-favorite-modules-errno.html"><code>Errno</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/05/my-favorite-modules-timepiece.html"><code>Time::Piece</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/06/core-modules-filetest.html"><code>filetest</code></a></li>
+    <li><a href="https://blogs.perl.org/users/tom_wyant/2022/06/my-favorite-modules-filestat.html"><code>File::stat</code></a></li>
+</ol>
+
+</body>
+</html>

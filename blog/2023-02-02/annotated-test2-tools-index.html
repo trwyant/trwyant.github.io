@@ -1,0 +1,22 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Annotated Test2::Tools Index</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Annotated Test2::Tools Index</h1>
+
+<p>I have very gradually been adopting <a href="https://metacpan.org/pod/Test2::V0">Test2::V0</a> as a testing tool. I had a test file that performed a group of tests inside a <code>for</code> loop, and discovered there were circumstances where I wanted to skip an iteration. Well, the <code>skip()</code> provided by <a href="https://metacpan.org/pod/Test2::Tools::Basic">Test2::Tools::Basic</a> operates by executing <code>last SKIP;</code>. In the case of a labeled <code>for</code> this skips not only the current iteration but all subsequent iterations.</p>
+
+<p>I wondered if there was a <code>Test2::Tools</code> plugin that did a <code>next SKIP;</code>, so I generated an <a href="https://trwyant.github.io/misc/all-perl-test2-tools.html">annotated index of Test2 tools</a>. This index reports all of them in ASCIIbetical order, with the distribution they are found in and the abstract from the <code>=head1 NAME</code> section of the POD.</p>
+
+<p>I found 44 tools after eliminating a few helper classes that lived in the same name space. None of the 44 appears to do what I want. It would be easy enough to create such a tool, but I doubted that anyone would use it but me. So I indented another level and stuck a <code>SKIP:</code> block inside the <code>for</code> loop.</p>
+
+<p>Like the previous <a href="https://trwyant.github.io/misc/all-perl-critic-policies.html">Annotated Perl::Critic Policy Index</a> this will be updated approximately weekly. That is, a cron job runs Friday morning, and I push the repository when I get around to it, after reviewing the change and coming up with (I hope) a descriptive commit message.</p>
+
+</body>
+</html>

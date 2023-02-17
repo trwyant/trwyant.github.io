@@ -1,0 +1,22 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Outstanding GitHub Items</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Outstanding GitHub Items</h1>
+
+<p>Recently I received a bump on a GitHub pull request. This surprised me, because I was unaware of anything outstanding. I was even more surprised when I discovered that the distribution in question also had two open issues, one dating back about three months.</p>
+
+<p>I have no idea why I was oblivious to these, but it made me want to audit myself to see if any other distributions had the same problem. GitHub has these nice links at the top of the page, <cite>Pull requests</cite> and <cite>Issues</cite>, but these show pull requests and issues that I initiated. I found no obvious way to display pull requests or issues filed against my repositories.</p>
+
+<p>Now, maybe it is just me, but I find GitHub's documentation moderately opaque. But with considerable help from Duck Duck Go, I discovered the answer: you type into the search box <code>is:open user:&lt;your GitHub user name&gt;</code>. This gets you both open issues and open pull requests. If you want, you can restrict this further with <code>is:issue</code> (for issues) or <code>is:pr</code> (for pull requests). Do <strong>not</strong> leave off the user name, even if you are logged in. If you forget this you will get every open item on GitHub -- all 102 million of them as of this writing.</p>
+
+<p>Now I am lazy, so I made a browser shortcut to do this for me. I don't think you get private repositories this way, but I was not worried about that. The string will have to be URI-escaped. So now if I want to audit myself I just click on <a href="https://github.com/search?q=user%3Atrwyant+is%3Aopen">https://github.com/search?q=user%3Atrwyant+is%3Aopen</a> and see what I get.</p>
+
+</body>
+</html>

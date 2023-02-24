@@ -1,0 +1,53 @@
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<title>Ordering Your Tests</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+
+<h1>Ordering Your Tests</h1>
+
+<p>By default, the <code>test</code> actions of both <a href="https://metacpan.org/pod/ExtUtils::MakeMaker"><code>ExtUtils::MakeMaker</code></a> and <a href="https://metacpan.org/pod/Module::Build"><code>Module::Build</code></a> test <code>t/*.t</code> in lexicographic order (a.k.a. ASCIIbetical order). Under this default, some Perl module authors who want tests performed in a given order have resorted to numbering tests: <code>t/01_basic.t</code>, <code>t/10_functional.t</code>, and so on.</p>
+
+<p>My personal preference is to take the lexicographic ordering into consideration when naming test files: <code>t/basic.t</code> through <code>t/whole_thing.t</code>. But the price of this choice is a certain number of contrived test names, and even the occasional thesaurus lookup.</p>
+
+<p>But there is a better way. Both <code>ExtUtils::MakeMaker</code> and <code>Module::Build</code> allow you to specify tests explicitly.</p>
+
+<p>Under <code>ExtUtils::MakeMaker</code> version 6.76 or above, you call <code>WriteMakeFile()</code> thus:</p>
+
+<pre>
+WriteMakeFile(
+    ...
+    test =&gt; {
+        TESTS =&gt; 't/one.t t/two.t t/three.t t/four.t',
+    },
+    ...
+);
+</pre>
+
+<p>If you do this, the tests specified (and <strong>only</strong> the tests specified) are performed in the order specified.</p>
+
+<p><code>ExtUtils::MakeMaker</code> version 6.76 was released September 5 2013 and shipped with Perl 5.19.4, so any reasonably modern Perl should support this.</p>
+
+<p>The equivalent incantation under <code>Module::Build</code> version 0.23 or above is:</p>
+
+<pre>
+Module::Build-&gt;new(
+    ...
+    test_files =&gt; [ qw{
+        t/one.t
+        t/two.t
+        t/three.t
+        t/four.t
+        } ],
+    ...
+)-&gt;create_build_script();
+</pre>
+
+<p><code>Module::Build</code> version 0.23 was released February 9 2004.</p>
+
+</body>
+</html>

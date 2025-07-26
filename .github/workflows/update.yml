@@ -1,0 +1,60 @@
+# Explicit name of workflow. This is optional.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#name
+name: Update repository
+
+# Specify the events that trigger this workflow.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+on:
+  # TODO this becomes scheduled or on-demand.
+  push:
+
+# Define the jobs that make up the workflow.
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobs
+jobs:
+
+  # Define a job called 'update'
+  update:
+
+    # The name of this job
+    name: Update toolset summaries
+
+    # Define where the job runs.
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idruns-on
+    runs-on: macos-latest
+
+    # The individual steps in the job
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Set up perl
+
+      # Specify the action performed by this step. In this case it is a
+      # custom action residing in repository shogo82148/actions-setup-perl
+      # and tagged v1. Yes, shogo82148 is the user name and
+      # actions-setup-perl is the repository name. See
+      # https://github.com/marketplace/actions/setup-perl-environment
+      # The available Perl versions are in
+      # https://github.com/shogo82148/actions-setup-perl/tree/main/versions
+      uses: shogo82148/actions-setup-perl@v1
+
+    - name: Set up required modules
+      run: |
+        perl -v
+        cpanm -v
+        cpanm Getopt::Long Pod::Usage Time::Piece CGI HTML::Entities
+        cpanm https://github.com/trwyant/perl-CPAN-Access-AdHoc.git
+
+    - name: Do update
+      run: |
+        perl misc/all-perl-critic-policies --html --count >misc/all-perl-critic-policies-test.html
+
+    - name: Commit change
+      run: |
+        git add misc
+        git commit -m "`date +%Y-%m-%d` test"
+
+    - name: Push changes
+      uses: ad-m/github-push-action@master

@@ -6,8 +6,9 @@ name: Update repository
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#on
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 on:
-  # TODO this becomes scheduled or on-demand.
-  push:
+  schedule:
+    - cron: '5 4 * * 5'
+  workflow_dispatch:
 
 # Define the jobs that make up the workflow.
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobs
@@ -49,12 +50,14 @@ jobs:
 
     - name: Do update
       run: |
-        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ --html --count >misc/all-perl-critic-policies-test.html
+        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ --html --count >misc/all-perl-critic-policies.html
+        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ Test2::Tools --html --count >misc/all-perl-test2-tools.html
+        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ Test2::Plugin --html --count >misc/all-test2-plugins.html
 
     - name: Commit change
       run: |
         git add misc
-        git commit -m "`date +%Y-%m-%d` test"
+        git commit -m "`date +%Y-%m-%d`"
 
     - name: Push changes
       uses: ad-m/github-push-action@master

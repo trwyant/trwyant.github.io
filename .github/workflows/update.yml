@@ -49,7 +49,7 @@ jobs:
 
     - name: Do update
       run: |
-        perl misc/all-perl-critic-policies --html --count >misc/all-perl-critic-policies-test.html
+        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ --html --count >misc/all-perl-critic-policies-test.html
 
     - name: Commit change
       run: |

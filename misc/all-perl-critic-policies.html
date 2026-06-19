@@ -10,9 +10,9 @@
 
 <h1>Annotated Perl::Critic Policy Index</h1>
 
-<p>Generated 2026-06-12 08:42:09 UTC</p>
+<p>Generated 2026-06-19 09:12:03 UTC</p>
 
-<p>Found 372 policies</p>
+<p>Found 374 policies</p>
 
 <dl>
 
@@ -53,7 +53,7 @@
 <dd>L/LI/LIOSHA/Perl-Critic-Policy-BuiltinFunctions-ProhibitDeleteOnArrays-0.02.tar.gz<br />Do not use &quot;delete&quot; on arrays.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach">Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach</a></dt>
-<dd>D/DJ/DJZORT/Perl-Critic-Policy-BuiltinFunctions-ProhibitForeach-0.01.tar.gz<br />Prohibit foreach keyword.</dd>
+<dd>D/DJ/DJZORT/Perl-Critic-Policy-BuiltinFunctions-ProhibitForeach-0.02.tar.gz<br />Prohibit foreach keyword.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::BuiltinFunctions::ProhibitLvalueSubstr">Perl::Critic::Policy::BuiltinFunctions::ProhibitLvalueSubstr</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use 4-argument &quot;substr&quot; instead of writing &quot;substr($foo, 2, 6) = $bar&quot;.</dd>
@@ -285,6 +285,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Compatibility::ProhibitUnixDevNull">Perl::Critic::Policy::Compatibility::ProhibitUnixDevNull</a></dt>
 <dd>K/KR/KRYDE/Perl-Critic-Pulp-100.tar.gz<br />Don&#39;t use explicit /dev/null.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls">Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls</a></dt>
+<dd>D/DJ/DJZORT/Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls-0.06.tar.gz<br />Prohibit unlabeled loop controls in non-loop blocks.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse">Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Don&#39;t write long &quot;if-elsif-elsif-elsif-elsif...else&quot; chains.</dd>
@@ -613,6 +616,9 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt">Perl::Critic::Policy::Mardem::ProhibitReturnBooleanAsInt</a></dt>
 <dd>M/MA/MARDEM/Perl-Critic-Mardem-0.06.tar.gz<br />Return boolean as int &quot;return 1;&quot;.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat">Perl::Critic::Policy::Misc::ProhibitMethodsInStringConcat</a></dt>
+<dd>D/DJ/DJZORT/Perl-Critic-Policy-Misc-ProhibitMethodsInStringConcat-0.01.tar.gz<br />Prohibit method calls in string concatenation.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Miscellanea::ProhibitFormats">Perl::Critic::Policy::Miscellanea::ProhibitFormats</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Do not use &quot;format&quot;.</dd>
 
@@ -764,7 +770,7 @@
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Split long regexps into smaller &quot;qr//&quot; chunks.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives">Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives</a></dt>
-<dd>W/WY/WYANT/Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives-0.005.tar.gz<br />Beware empty alternatives, because they always match.</dd>
+<dd>W/WY/WYANT/Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives-0.006.tar.gz<br />Beware empty alternatives, because they always match.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitEnumeratedClasses">Perl::Critic::Policy::RegularExpressions::ProhibitEnumeratedClasses</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use named character classes instead of explicit character lists.</dd>
@@ -989,7 +995,7 @@
 <dd>K/KR/KRYDE/Perl-Critic-Pulp-100.tar.gz<br />Don&#39;t use the -f file test.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX">Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX</a></dt>
-<dd>W/WY/WYANT/Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX-0.002.tar.gz<br />Prohibit file access tests.</dd>
+<dd>W/WY/WYANT/Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX-0.003.tar.gz<br />Prohibit file access tests.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitImplicitNewlines">Perl::Critic::Policy::ValuesAndExpressions::ProhibitImplicitNewlines</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use concatenation or HEREDOCs instead of literal line breaks in strings.</dd>
@@ -1088,7 +1094,7 @@
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Avoid $`, $&amp;, $&#39; and their English equivalents.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero">Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero</a></dt>
-<dd>W/WY/WYANT/Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero-0.002.tar.gz<br />Don&#39;t use numeric variable names with leading zeroes.</dd>
+<dd>W/WY/WYANT/Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero-0.003.tar.gz<br />Don&#39;t use numeric variable names with leading zeros.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitPackageVars">Perl::Critic::Policy::Variables::ProhibitPackageVars</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Eliminate globals declared with &quot;our&quot; or &quot;use vars&quot;.</dd>

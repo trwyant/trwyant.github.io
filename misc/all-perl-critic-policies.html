@@ -10,9 +10,9 @@
 
 <h1>Annotated Perl::Critic Policy Index</h1>
 
-<p>Generated 2026-08-21 04:52:05 UTC</p>
+<p>Generated 2026-08-28 16:34:50 UTC</p>
 
-<p>Found 378 policies</p>
+<p>Found 380 policies</p>
 
 <dl>
 
@@ -161,7 +161,7 @@
 <dd>S/SN/SNEZ/Perl-Critic-PolicyBundle-SNEZ-0.03.tar.gz<br />Parenthesise in K&amp;R style.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::CodeLayout::RequireParensWithBuiltins">Perl::Critic::Policy::CodeLayout::RequireParensWithBuiltins</a></dt>
-<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.7.tar.gz<br />Write &quot;lc($x // &quot;Default&quot;)&quot; instead of &quot;lc $x // &quot;Default&quot;&quot;.</dd>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Write &quot;lc($x // &quot;Default&quot;)&quot; instead of &quot;lc $x // &quot;Default&quot;&quot;.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::CodeLayout::RequireSpaceAroundBinaryOperators">Perl::Critic::Policy::CodeLayout::RequireSpaceAroundBinaryOperators</a></dt>
 <dd>S/SN/SNEZ/Perl-Critic-PolicyBundle-SNEZ-0.03.tar.gz<br />Put spaces around operators.</dd>
@@ -305,7 +305,7 @@
 <dd>D/DJ/DJZORT/Perl-Critic-PolicyBundle-LoopsAndLabels-0.07.tar.gz<br />Prohibit goto LABEL that jumps into a loop or block construct.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ControlStructures::ProhibitInlineDo">Perl::Critic::Policy::ControlStructures::ProhibitInlineDo</a></dt>
-<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.7.tar.gz<br />Use subroutines instead of inline do-blocks.</dd>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Use subroutines instead of inline do-blocks.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames">Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Don&#39;t use labels that are the same as the special block names.</dd>
@@ -770,10 +770,10 @@
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Write &quot;@{ $array_ref }&quot; instead of @$array_ref.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::References::ProhibitRefChecks">Perl::Critic::Policy::References::ProhibitRefChecks</a></dt>
-<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.7.tar.gz<br />Write is_arrayref($var) instead of &quot;ref($var) eq &#39;ARRAY&#39;&quot;.</dd>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Write is_arrayref($var) instead of &quot;ref($var) eq &#39;ARRAY&#39;&quot;.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::References::RequireSigils">Perl::Critic::Policy::References::RequireSigils</a></dt>
-<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.7.tar.gz<br />Only use dereferencing arrows for method calls; use sigils to signal types.</dd>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Only use dereferencing arrows for method calls; use sigils to signal types.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest">Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Capture variable used outside conditional.</dd>
@@ -894,6 +894,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Subroutines::RequireFinalReturn">Perl::Critic::Policy::Subroutines::RequireFinalReturn</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />End every path through a subroutine with an explicit &quot;return&quot; statement.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Subroutines::RequireSubOrder">Perl::Critic::Policy::Subroutines::RequireSubOrder</a></dt>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Place subroutines in dependency order.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict">Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Prohibit various flavors of &quot;no strict&quot;.</dd>
@@ -1075,6 +1078,9 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator">Perl::Critic::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Write &quot; print &lt;&lt;&#39;THE_END&#39; &quot; or &quot; print &lt;&lt;&quot;THE_END&quot; &quot;.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::RequireSlices">Perl::Critic::Policy::ValuesAndExpressions::RequireSlices</a></dt>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Use array and hash slices for multiple lookups.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator">Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Write &quot; &lt;&lt;&#39;THE_END&#39;; &quot; instead of &quot; &lt;&lt;&#39;theEnd&#39;; &quot;.</dd>
 
@@ -1121,7 +1127,7 @@
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Do not reuse a variable name in a lexical scope.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitTopicIterator">Perl::Critic::Policy::Variables::ProhibitTopicIterator</a></dt>
-<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.7.tar.gz<br />Use named loop control variables.</dd>
+<dd>B/BB/BBLACKM/Perl-Critic-Grape-0.0.9.tar.gz<br />Use named loop control variables.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitUnusedVariables">Perl::Critic::Policy::Variables::ProhibitUnusedVariables</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Don&#39;t ask for storage you don&#39;t need.</dd>

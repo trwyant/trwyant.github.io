@@ -10,9 +10,9 @@
 
 <h1>Annotated Perl::Critic Policy Index</h1>
 
-<p>Generated 2026-09-11 08:54:45 UTC</p>
+<p>Generated 2026-09-18 09:01:03 UTC</p>
 
-<p>Found 381 policies</p>
+<p>Found 384 policies</p>
 
 <dl>
 
@@ -538,6 +538,9 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::InputOutput::ProhibitReadlineInForLoop">Perl::Critic::Policy::InputOutput::ProhibitReadlineInForLoop</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Write &quot;while( $line = &lt;&gt; ){...}&quot; instead of &quot;for(&lt;&gt;){...}&quot;.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::InputOutput::ProhibitRepeatedPrints">Perl::Critic::Policy::InputOutput::ProhibitRepeatedPrints</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-InputOutput-ProhibitRepeatedPrints-0.001.tar.gz<br />Build the string, then print it once.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen">Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Write &quot;open $fh, q{&lt;}, $filename;&quot; instead of &quot;open $fh, &quot;&lt;$filename&quot;;&quot;.</dd>
 
@@ -775,6 +778,9 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::References::RequireSigils">Perl::Critic::Policy::References::RequireSigils</a></dt>
 <dd>B/BB/BBLACKM/Perl-Critic-Grape-0.1.0.tar.gz<br />Only use dereferencing arrows for method calls; use sigils to signal types.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::PreventUselessMetacharacterEscapes">Perl::Critic::Policy::RegularExpressions::PreventUselessMetacharacterEscapes</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-RegularExpressions-PreventUselessMetacharacterEscapes-1.000.tar.gz<br />\Q...\E is for the variable you are interpolating, not for the text around it.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest">Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Capture variable used outside conditional.</dd>
 
@@ -993,6 +999,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma">Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Don&#39;t &quot;use constant FOO =&gt; 15&quot;.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength">Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitDefinedBeforeLength-0.001.tar.gz<br />Test the value, not its length, and shape it before measuring it.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys">Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys</a></dt>
 <dd>K/KR/KRYDE/Perl-Critic-Pulp-100.tar.gz<br />Disallow duplicate literal hash keys.</dd>

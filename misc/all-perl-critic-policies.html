@@ -10,9 +10,9 @@
 
 <h1>Annotated Perl::Critic Policy Index</h1>
 
-<p>Generated 2026-09-18 09:01:03 UTC</p>
+<p>Generated 2026-09-25 18:55:37 UTC</p>
 
-<p>Found 384 policies</p>
+<p>Found 387 policies</p>
 
 <dl>
 
@@ -45,6 +45,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep">Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use &quot;any&quot; from &quot;List::Util&quot;, &quot;List::SomeUtils&quot;, or &quot;List::MoreUtils&quot; instead of &quot;grep&quot; in boolean context.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::BuiltinFunctions::ProhibitChainingSameListSub">Perl::Critic::Policy::BuiltinFunctions::ProhibitChainingSameListSub</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-BuiltinFunctions-ProhibitChainingSameListSub-0.001.tar.gz<br />Walk a list once: do not feed map into map, or grep into grep.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::BuiltinFunctions::ProhibitComplexMappings">Perl::Critic::Policy::BuiltinFunctions::ProhibitComplexMappings</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Map blocks should have a single statement.</dd>
@@ -799,6 +802,9 @@
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches">Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use &quot;eq&quot; or hash instead of fixed-pattern regexps.</dd>
 
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitRegexToStripAffix">Perl::Critic::Policy::RegularExpressions::ProhibitRegexToStripAffix</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-RegularExpressions-ProhibitRegexToStripAffix-0.001.tar.gz<br />Take a known prefix or suffix off a string without a regex capture.</dd>
+
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation">Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Use &quot;[abc]&quot; instead of &quot;a|b|c&quot;.</dd>
 
@@ -1001,7 +1007,7 @@
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Don&#39;t &quot;use constant FOO =&gt; 15&quot;.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength">Perl::Critic::Policy::ValuesAndExpressions::ProhibitDefinedBeforeLength</a></dt>
-<dd>T/TE/TEODESIAN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitDefinedBeforeLength-0.001.tar.gz<br />Test the value, not its length, and shape it before measuring it.</dd>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitDefinedBeforeLength-0.002.tar.gz<br />Test the value, not its length, and shape it before measuring it.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys">Perl::Critic::Policy::ValuesAndExpressions::ProhibitDuplicateHashKeys</a></dt>
 <dd>K/KR/KRYDE/Perl-Critic-Pulp-100.tar.gz<br />Disallow duplicate literal hash keys.</dd>
@@ -1149,6 +1155,9 @@
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitUselessInitialization">Perl::Critic::Policy::Variables::ProhibitUselessInitialization</a></dt>
 <dd>J/JT/JTRAMMELL/Perl-Critic-PetPeeves-JTRAMMELL-0.04.tar.gz<br />Prohibit superfluous initializations.</dd>
+
+<dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProhibitUselessVarClearing">Perl::Critic::Policy::Variables::ProhibitUselessVarClearing</a></dt>
+<dd>T/TE/TEODESIAN/Perl-Critic-Policy-Variables-ProhibitUselessVarClearing-0.001.tar.gz<br />Do not empty a lexical that nothing reads again before it goes out of scope.</dd>
 
 <dt><br /> <a href="https://metacpan.org/module/Perl::Critic::Policy::Variables::ProtectPrivateVars">Perl::Critic::Policy::Variables::ProtectPrivateVars</a></dt>
 <dd>P/PE/PETDANCE/Perl-Critic-1.156.tar.gz<br />Prevent access to private vars in other packages.</dd>

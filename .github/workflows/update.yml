@@ -53,6 +53,7 @@ jobs:
         perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ --html --count >misc/all-perl-critic-policies.html
         perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ Test2::Tools --html --count >misc/all-perl-test2-tools.html
         perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ Test2::Plugin --html --count >misc/all-test2-plugins.html
+        perl misc/all-perl-critic-policies --cpan http://www.cpan.org/ Test2::Require --html --count >misc/all-test2-requires.html
 
     - name: Commit change
       run: |
